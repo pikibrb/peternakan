@@ -13,7 +13,7 @@ return new class extends Migration
     {
        Schema::create('pengurangan_populasis', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('kelompok_bebek_id')->constrained('kelompok_bebeks')->cascadeOnDelete();
+            $table->foreignId('kelompok_bebek_id')->constrained('kelompok_bebek')->cascadeOnDelete();
             $table->date('tanggal');
             $table->integer('jumlah');
             $table->string('penyebab');

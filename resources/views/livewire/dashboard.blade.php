@@ -75,48 +75,49 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const ctxProduksi = document.getElementById('chartProduksi').getContext('2d');
-            new Chart(ctxProduksi, {
-                type: 'line',
-                data: {
-                    labels: @json($chartProduksiData['labels']),
-                    datasets: [{
-                        label: 'Telur Layak Jual',
-                        data: @json($chartProduksiData['values']),
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
 
-            const ctxPenjualan = document.getElementById('chartPenjualan').getContext('2d');
-            new Chart(ctxPenjualan, {
-                type: 'bar',
-                data: {
-                    labels: @json($chartPenjualanData['labels']),
-                    datasets: [{
-                        label: 'Total Penjualan (Rp)',
-                        data: @json($chartPenjualanData['values']),
-                        backgroundColor: '#6366f1'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    }
+    @script
+    <script>
+        const ctxProduksi = document.getElementById('chartProduksi').getContext('2d');
+        new Chart(ctxProduksi, {
+            type: 'line',
+            data: {
+                labels: $wire.chartProduksiData.labels || [],
+                datasets: [{
+                    label: 'Telur Layak Jual',
+                    data: $wire.chartProduksiData.values || [],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
                 }
-            });
+            }
+        });
+
+        const ctxPenjualan = document.getElementById('chartPenjualan').getContext('2d');
+        new Chart(ctxPenjualan, {
+            type: 'bar',
+            data: {
+                labels: $wire.chartPenjualanData.labels || [],
+                datasets: [{
+                    label: 'Total Penjualan (Rp)',
+                    data: $wire.chartPenjualanData.values || [],
+                    backgroundColor: '#6366f1'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                }
+            }
         });
     </script>
+    @endscript
 </div>

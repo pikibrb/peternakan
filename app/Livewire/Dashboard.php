@@ -22,9 +22,9 @@ class Dashboard extends Component
 
     public function mount()
     {
-        $this->totalPopulasi = KelompokBebek::sum('jumlah_saat_ini');
+        $this->totalPopulasi = KelompokBebek::where('status', 'Aktif')->sum('populasi_aktif');
 
-        $this->produksiHariIni = ProduksiTelur::whereDate('tanggal', now()->today())
+        $this->produksiHariIni = ProduksiTelur::whereDate('tanggal_produksi', today())
             ->sum('telur_layak_jual');
 
         $totalTelurDiproduksi = ProduksiTelur::sum('telur_layak_jual');
@@ -39,15 +39,15 @@ class Dashboard extends Component
 
     public function loadChartData()
     {
-        $produksi7Hari = ProduksiTelur::select('tanggal', DB::raw('SUM(telur_layak_jual) as total'))
-            ->groupBy('tanggal')
-            ->orderBy('tanggal', 'desc')
+        $produksi7Hari = ProduksiTelur::select('tanggal_produksi', DB::raw('SUM(telur_layak_jual) as total'))
+            ->groupBy('tanggal_produksi')
+            ->orderBy('tanggal_produksi', 'desc')
             ->take(7)
             ->get()
             ->reverse();
 
         $this->chartProduksiData = [
-            'labels' => $produksi7Hari->pluck('tanggal')->map(fn($d) => date('d/m', strtotime($d)))->toArray(),
+            'labels' => $produksi7Hari->pluck('tanggal_produksi')->map(fn($d) => date('d/m', strtotime($d)))->toArray(),
             'values' => $produksi7Hari->pluck('total')->toArray(),
         ];
 
