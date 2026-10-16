@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Forms\KelompokBebekForm;
 use App\Models\KelompokBebek;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
@@ -7,21 +8,15 @@ use Livewire\WithPagination;
 new class extends Component {
     use WithPagination;
 
+    public KelompokBebekForm $form;
+
     public $search = '';
     public $statusFilter = 'Aktif';
-
-    // Properti Modal Form
     public $isModalOpen = false;
-    public $nama_kandang = '';
-    public $jenis_bebek = '';
-    public $fase = 'Layer';
-    public $umur_awal_minggu = 0;
-    public $tanggal_masuk = '';
-    public $populasi_awal = '';
 
     public function mount()
     {
-        $this->tanggal_masuk = date('Y-m-d');
+        $this->form->tanggal_masuk = date('Y-m-d');
     }
 
     public function updatingSearch()
@@ -32,10 +27,8 @@ new class extends Component {
     public function openModal()
     {
         $this->resetValidation();
-        $this->reset(['nama_kandang', 'jenis_bebek', 'fase', 'populasi_awal']);
-        $this->tanggal_masuk = date('Y-m-d');
-        $this->fase = 'Layer';
-        $this->umur_awal_minggu = 0;
+        $this->form->reset();
+        $this->form->tanggal_masuk = date('Y-m-d');
         $this->isModalOpen = true;
     }
 
@@ -46,25 +39,7 @@ new class extends Component {
 
     public function save()
     {
-        $this->validate([
-            'nama_kandang' => 'required|string|max:255',
-            'jenis_bebek' => 'required|string|max:255',
-            'fase' => 'required|in:Starter,Grower,Layer,Afkir',
-            'tanggal_masuk' => 'required|date',
-            'umur_awal_minggu' => 'required|integer|min:0',
-            'populasi_awal' => 'required|integer|min:1',
-        ]);
-
-        KelompokBebek::create([
-            'nama_kandang' => $this->nama_kandang,
-            'jenis_bebek' => $this->jenis_bebek,
-            'fase' => $this->fase,
-            'tanggal_masuk' => $this->tanggal_masuk,
-            'umur_awal_minggu' => $this->umur_awal_minggu,
-            'populasi_awal' => $this->populasi_awal,
-            'populasi_aktif' => $this->populasi_awal,
-            'status' => 'Aktif',
-        ]);
+        $this->form->store();
 
         $this->closeModal();
 
@@ -79,28 +54,18 @@ new class extends Component {
     {
         $query = KelompokBebek::query()
             ->when($this->search, function ($q) {
-                $q->where('nama_kandang', 'like', '%' . $this->search . '%')->orWhere('jenis_bebek', 'like', '%' . $this->search . '%');
+                $q->where(function ($q) {
+                    $q->where('nama_kandang', 'like', '%' . $this->search . '%')
+                        ->orWhere('jenis_bebek', 'like', '%' . $this->search . '%');
+                });
             })
             ->when($this->statusFilter !== 'Semua', function ($q) {
                 $q->where('status', $this->statusFilter);
             });
 
-        $totalPopulasi = KelompokBebek::where('status', 'Aktif')->sum('populasi_aktif');
-        $kelompokAktif = KelompokBebek::where('status', 'Aktif')->count();
-        $populasiAwal = KelompokBebek::where('status', 'Aktif')->sum('populasi_awal');
-
-        $tingkatDeplesi = 0;
-        if ($populasiAwal > 0) {
-            $tingkatDeplesi = round((($populasiAwal - $totalPopulasi) / $populasiAwal) * 100, 1);
-        }
-
         return [
             'kelompok_bebek' => $query->orderBy('created_at', 'desc')->paginate(10),
-            'stats' => [
-                'total_populasi' => $totalPopulasi,
-                'kelompok_aktif' => $kelompokAktif,
-                'tingkat_deplesi' => $tingkatDeplesi,
-            ],
+            'stats' => KelompokBebek::statistikAktif(),
         ];
     }
 }; ?>
@@ -193,8 +158,7 @@ new class extends Component {
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="p-4">
                                 <p class="font-bold text-sm text-gray-900">{{ $kelompok->nama_kandang }}</p>
-                                <p class="text-xs text-gray-500">{{ $kelompok->jenis_bebek }} • Masuk:
-                                    {{ \Carbon\Carbon::parse($kelompok->tanggal_masuk)->format('d/m/Y') }}</p>
+                                <p class="text-xs text-gray-500">{{ $kelompok->jenis_bebek }} • Masuk:{{ $kelompok->tanggal_masuk->format('d/m/Y') }}</p>
                             </td>
                             <td class="p-4 text-center">
                                 <span
@@ -297,47 +261,47 @@ new class extends Component {
             <div class="p-6 flex flex-col gap-4">
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-semibold text-gray-700">Nama Kandang / ID Flock</label>
-                    <input wire:model="nama_kandang" type="text" placeholder="Misal: Kandang A1" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none">
-                    @error('nama_kandang') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                    <input wire:model="form.nama_kandang" type="text" placeholder="Misal: Kandang A1" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                    @error('form.nama_kandang') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="flex flex-col gap-1.5">
                     <label class="text-sm font-semibold text-gray-700">Jenis / Strain Bebek</label>
-                    <input wire:model="jenis_bebek" type="text" placeholder="Misal: Petelur Mojosari" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none">
-                    @error('jenis_bebek') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                    <input wire:model="form.jenis_bebek" type="text" placeholder="Misal: Petelur Mojosari" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                    @error('form.jenis_bebek') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="flex flex-col gap-1.5">
                         <label class="text-sm font-semibold text-gray-700">Fase Pemeliharaan</label>
-                        <select wire:model="fase" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white">
+                        <select wire:model="form.fase" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none bg-white">
                             <option value="Starter">Starter (Anakan)</option>
                             <option value="Grower">Grower (Pertumbuhan)</option>
                             <option value="Layer">Layer (Bertelur)</option>
                             <option value="Afkir">Afkir</option>
                         </select>
-                        @error('fase') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                        @error('form.fase') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="flex flex-col gap-1.5">
                         <label class="text-sm font-semibold text-gray-700">Tanggal Masuk</label>
-                        <input wire:model="tanggal_masuk" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none">
-                        @error('tanggal_masuk') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                        <input wire:model="form.tanggal_masuk" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                        @error('form.tanggal_masuk') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="flex flex-col gap-1.5">
                         <label class="text-sm font-semibold text-gray-700">Umur Awal (Minggu)</label>
-                        <input wire:model="umur_awal_minggu" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                        <input wire:model="form.umur_awal_minggu" type="number" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none">
                         <span class="text-xs text-gray-500">Ketik 0 jika anakan (DOD).</span>
-                        @error('umur_awal_minggu') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                        @error('form.umur_awal_minggu') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                     </div>
 
                     <div class="flex flex-col gap-1.5">
                         <label class="text-sm font-semibold text-gray-700">Populasi Awal (Ekor)</label>
-                        <input wire:model="populasi_awal" type="number" placeholder="Jumlah saat check-in" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none">
-                        @error('populasi_awal') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                        <input wire:model="form.populasi_awal" type="number" placeholder="Jumlah saat check-in" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+                        @error('form.populasi_awal') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                     </div>
                 </div>
             </div>

@@ -1,9 +1,8 @@
 <?php
+
 use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
-use livewire\Volt\Volt;
-
-
+use Livewire\Volt\Volt;
 
 Route::get('dashboard', Dashboard::class)
     ->middleware(['auth', 'verified'])

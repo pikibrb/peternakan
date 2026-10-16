@@ -74,8 +74,6 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     @script
     <script>
         const ctxProduksi = document.getElementById('chartProduksi').getContext('2d');

@@ -2,27 +2,32 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use Livewire\Attributes\Layout;
-use App\Models\KelompokBebek;
-use App\Models\ProduksiTelur;
-use App\Models\Penjualan;
 use App\Models\DetailPenjualan;
+use App\Models\KelompokBebek;
+use App\Models\Penjualan;
+use App\Models\ProduksiTelur;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Layout;
+use Livewire\Component;
 
 #[Layout('layouts.app')]
 class Dashboard extends Component
 {
     public $totalPopulasi = 0;
+
     public $produksiHariIni = 0;
+
     public $stokTelur = 0;
+
     public $totalPenjualan = 0;
+
     public $chartProduksiData = [];
+
     public $chartPenjualanData = [];
 
     public function mount()
     {
-        $this->totalPopulasi = KelompokBebek::where('status', 'Aktif')->sum('populasi_aktif');
+        $this->totalPopulasi = KelompokBebek::statistikAktif()['total_populasi'];
 
         $this->produksiHariIni = ProduksiTelur::whereDate('tanggal_produksi', today())
             ->sum('telur_layak_jual');
@@ -31,8 +36,7 @@ class Dashboard extends Component
         $totalTelurTerjual = DetailPenjualan::sum('jumlah_telur');
         $this->stokTelur = max(0, $totalTelurDiproduksi - $totalTelurTerjual);
 
-        $this->totalPenjualan = Penjualan::where('status_pembayaran', 'Lunas')
-            ->sum('total_penjualan');
+        $this->totalPenjualan = Penjualan::lunas()->sum('total_penjualan');
 
         $this->loadChartData();
     }
@@ -47,12 +51,12 @@ class Dashboard extends Component
             ->reverse();
 
         $this->chartProduksiData = [
-            'labels' => $produksi7Hari->pluck('tanggal_produksi')->map(fn($d) => date('d/m', strtotime($d)))->toArray(),
+            'labels' => $produksi7Hari->pluck('tanggal_produksi')->map(fn ($d) => $d->format('d/m'))->toArray(),
             'values' => $produksi7Hari->pluck('total')->toArray(),
         ];
 
         $penjualan7Hari = Penjualan::select('tanggal_penjualan', DB::raw('SUM(total_penjualan) as total'))
-            ->where('status_pembayaran', 'Lunas')
+            ->lunas()
             ->groupBy('tanggal_penjualan')
             ->orderBy('tanggal_penjualan', 'desc')
             ->take(7)
@@ -60,7 +64,7 @@ class Dashboard extends Component
             ->reverse();
 
         $this->chartPenjualanData = [
-            'labels' => $penjualan7Hari->pluck('tanggal_penjualan')->map(fn($d) => date('d/m', strtotime($d)))->toArray(),
+            'labels' => $penjualan7Hari->pluck('tanggal_penjualan')->map(fn ($d) => $d->format('d/m'))->toArray(),
             'values' => $penjualan7Hari->pluck('total')->toArray(),
         ];
     }
