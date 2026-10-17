@@ -43,6 +43,7 @@ class MonitoringPertumbuhanForm extends Form
     public function rules(): array
     {
         return [
+            'kelompok_bebek_id' => ['required', 'integer', 'exists:kelompok_bebek,id'],
             'tanggal' => [
                 'required',
                 'date',
@@ -65,6 +66,7 @@ class MonitoringPertumbuhanForm extends Form
     public function validationAttributes(): array
     {
         return [
+            'kelompok_bebek_id' => 'kandang / kelompok',
             'tanggal' => 'tanggal sampling',
             'jumlah_sampel' => 'jumlah sampel',
             'berat_rata_rata' => 'berat rata-rata',

@@ -126,13 +126,31 @@ new class extends Component {
     }
 
     /**
-     * Kelompok terpilih untuk aksi tulis (tambah/edit/hapus).
+     * Kelompok terpilih untuk aksi tulis (tambah/edit/hapus). Bila kandang
+     * yang tersimpan di state sudah tidak ada (mis. dihapus dari menu lain),
+     * pulihkan ke kandang pertama — sama seperti yang ditampilkan halaman —
+     * supaya tombol aksi tidak diam-diam gagal.
      */
     private function kelompokAktif(): ?KelompokBebek
     {
-        return $this->kelompokId === null
+        $kelompok = $this->kelompokId === null
             ? null
             : KelompokBebek::find($this->kelompokId);
+
+        if ($kelompok !== null) {
+            return $kelompok;
+        }
+
+        $kelompok = KelompokBebek::query()
+            ->orderBy('status')
+            ->orderBy('nama_kandang')
+            ->first();
+
+        if ($kelompok !== null) {
+            $this->kelompokId = $kelompok->id;
+        }
+
+        return $kelompok;
     }
 
     public function with(): array
@@ -616,10 +634,25 @@ new class extends Component {
         {{-- Modal catat/koreksi sampling --}}
         <x-app-modal :judul="$form->isEdit() ? 'Koreksi Sampling Pertumbuhan' : 'Catat Sampling Pertumbuhan'"
                      :subjudul="$kelompokTerpilih->nama_kandang.' • '.$kelompokTerpilih->jenis_bebek">
+                    {{-- Ringkasan galat: modal bisa discroll, jadi pesan di bawah
+                         tombol simpan mudah terlewat dan terlihat seperti "tidak
+                         terjadi apa-apa". --}}
+                    @if ($errors->any())
+                        <div class="rounded-lg border border-red-200 bg-red-50 p-3">
+                            <p class="text-sm font-semibold text-red-700">Data belum bisa disimpan:</p>
+                            <ul class="mt-1 list-disc list-inside space-y-0.5">
+                                @foreach ($errors->all() as $pesan)
+                                    <li class="text-xs text-red-600">{{ $pesan }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="flex flex-col gap-1.5">
                             <label class="text-sm font-semibold text-gray-700">Tanggal Sampling</label>
                             <input wire:model.live="form.tanggal" type="date"
+                                   max="{{ today()->toDateString() }}"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none">
                             @error('form.tanggal') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                         </div>

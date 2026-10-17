@@ -25,7 +25,7 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
 
         $component = Volt::test('pages.auth.login')
-            ->set('form.email', $user->email)
+            ->set('form.username', $user->username)
             ->set('form.password', 'password');
 
         $component->call('login');
@@ -42,7 +42,7 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
 
         $component = Volt::test('pages.auth.login')
-            ->set('form.email', $user->email)
+            ->set('form.username', $user->username)
             ->set('form.password', 'wrong-password');
 
         $component->call('login');
@@ -64,7 +64,7 @@ class AuthenticationTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSeeVolt('layout.navigation');
+            ->assertSeeVolt('layout.sidebar');
     }
 
     public function test_users_can_logout(): void
@@ -73,7 +73,7 @@ class AuthenticationTest extends TestCase
 
         $this->actingAs($user);
 
-        $component = Volt::test('layout.navigation');
+        $component = Volt::test('layout.sidebar');
 
         $component->call('logout');
 

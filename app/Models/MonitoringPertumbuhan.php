@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class MonitoringPertumbuhan extends Model
 {
@@ -35,5 +37,19 @@ class MonitoringPertumbuhan extends Model
     public function kelompokBebek()
     {
         return $this->belongsTo(KelompokBebek::class, 'kelompok_bebek_id');
+    }
+
+    /**
+     * Simpan tanggal sebagai tanggal murni (Y-m-d), bukan string datetime.
+     * MySQL memotong otomatis isi kolom DATE, tetapi SQLite menyimpannya apa
+     * adanya sehingga pengecekan unik "satu kandang satu sampling per hari"
+     * (Rule::unique pada form) gagal cocok. Menulis Y-m-d membuat perilaku
+     * konsisten di semua driver.
+     */
+    protected function tanggal(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => blank($value) ? null : Carbon::parse($value)->toDateString(),
+        );
     }
 }

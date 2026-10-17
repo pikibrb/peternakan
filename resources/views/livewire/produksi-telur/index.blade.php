@@ -55,8 +55,13 @@ new class extends Component {
         $this->resetValidation();
         $this->form->reset();
         $this->form->tanggal_produksi = today()->toDateString();
-        $this->form->kelompok_bebek_id = $this->flock_id
-            ?? KelompokBebek::query()->where('status', 'Aktif')->orderBy('nama_kandang')->value('id');
+
+        // Filter "Semua kandang" dari <select> berupa string kosong, bukan
+        // null; pakai filled() dan sediakan kandang aktif pertama sebagai
+        // pilihan bawaan supaya modal tidak terbuka tanpa kandang terpilih.
+        $this->form->kelompok_bebek_id = filled($this->flock_id)
+            ? $this->flock_id
+            : (KelompokBebek::query()->where('status', 'Aktif')->orderBy('nama_kandang')->value('id') ?? '');
 
         $this->isModalOpen = true;
     }
