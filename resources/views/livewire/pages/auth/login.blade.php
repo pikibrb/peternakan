@@ -22,32 +22,38 @@ $login = function () {
 ?>
 
 <div>
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <div>
+        <h1 class="text-xl font-bold tracking-tight text-gray-900">Masuk</h1>
+        <p class="text-sm text-gray-500 mt-1">Kelola kandang, produksi telur, dan penjualan.</p>
+    </div>
 
-    <form wire:submit="login">
+    <x-auth-session-status class="mt-4" :status="session('status')" />
+
+    <form wire:submit="login" class="mt-6 space-y-5">
         <div>
-            <x-input-label for="username" :value="__('Username')" />
-            <x-text-input wire:model="form.username" id="username" class="block mt-1 w-full" type="text" name="username" required autofocus autocomplete="username" />
+            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+            <input wire:model="form.username" id="username" type="text" name="username" required autofocus autocomplete="username"
+                   class="mt-1.5 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500" />
             <x-input-error :messages="$errors->get('form.username')" class="mt-2" />
         </div>
 
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input wire:model="form.password" id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">Kata Sandi</label>
+            <input wire:model="form.password" id="password" type="password" name="password" required autocomplete="current-password"
+                   class="mt-1.5 block w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500" />
             <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
         </div>
 
-        <div class="block mt-4">
-            <label for="remember" class="inline-flex items-center">
-                <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
+        <label for="remember" class="flex items-center gap-2">
+            <input wire:model="form.remember" id="remember" type="checkbox" name="remember"
+                   class="rounded border-gray-300 text-emerald-600 shadow-sm focus:ring-emerald-500" />
+            <span class="text-sm text-gray-600">Ingat saya</span>
+        </label>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
+        <button type="submit"
+                class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-lg text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+            <span class="material-symbols-outlined text-[18px]">login</span>
+            Masuk
+        </button>
     </form>
 </div>
