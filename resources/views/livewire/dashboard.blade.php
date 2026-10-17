@@ -1,121 +1,165 @@
-<div class="p-6 bg-gray-50 min-h-screen">
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Dashboard Peternakan</h1>
-        <p class="text-sm text-gray-600">Ringkasan performa populasi, produksi telur, dan penjualan.</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Populasi Bebek</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ number_format($totalPopulasi) }} ekor</p>
-                </div>
-                <div class="p-3 bg-blue-50 rounded-lg text-blue-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                    </svg>
-                </div>
-            </div>
+<div class="space-y-6">
+    {{-- Header --}}
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Dashboard Peternakan</h1>
+            <p class="text-sm text-gray-500 mt-1">
+                Ringkasan populasi, produksi telur, dan penjualan. Data dihitung saat halaman dibuka.
+            </p>
         </div>
-
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Produksi Hari Ini</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ number_format($produksiHariIni) }} butir</p>
-                </div>
-                <div class="p-3 bg-emerald-50 rounded-lg text-emerald-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Stok Telur Layak Jual</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">{{ number_format($stokTelur) }} butir</p>
-                </div>
-                <div class="p-3 bg-amber-50 rounded-lg text-amber-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v1a2 2 0 01-2 2M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
-                    </svg>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Penjualan</p>
-                    <p class="text-2xl font-bold text-gray-900 mt-2">Rp {{ number_format($totalPenjualan, 0, ',', '.') }}</p>
-                </div>
-                <div class="p-3 bg-indigo-50 rounded-lg text-indigo-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-            </div>
+        <div class="flex flex-wrap gap-2 print:hidden">
+            <a href="{{ route('produksi-telur') }}" wire:navigate
+               class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                <span class="material-symbols-outlined text-[20px]">egg_alt</span>
+                Catat Telur
+            </a>
+            <a href="{{ route('laporan') }}" wire:navigate
+               class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                <span class="material-symbols-outlined text-[20px]">description</span>
+                Laporan
+            </a>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Grafik Produksi Telur (7 Hari Terakhir)</h3>
-            <canvas id="chartProduksi"></canvas>
+    {{-- KPI --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <x-stat-card label="Populasi Aktif" ikon="cruelty_free" warna="blue"
+                     :nilai="number_format($populasi['total_populasi'], 0, ',', '.')" satuan="ekor"
+                     :bawah="number_format($populasi['kelompok_aktif'], 0, ',', '.').' kandang aktif • deplesi '
+                        .number_format($populasi['tingkat_deplesi'], 1, ',', '.').'% dari '
+                        .number_format($populasi['populasi_awal'], 0, ',', '.').' ekor awal'" />
+
+        <x-stat-card label="Produksi Hari Ini" ikon="egg" warna="emerald"
+                     :nilai="number_format($produksiHariIni, 0, ',', '.')" satuan="butir"
+                     :bawah="$produksiHariIni > 0
+                        ? 'Hen-day '.number_format($henDayHariIni, 1, ',', '.').'% dari bebek pengeram hari ini'
+                        : 'Belum ada pencatatan produksi hari ini'" />
+
+        <x-stat-card label="Stok Telur Siap Jual" ikon="inventory_2" warna="amber"
+                     :nilai="number_format($stokTelur, 0, ',', '.')" satuan="butir"
+                     bawah="Telur layak jual hasil produksi dikurangi telur yang sudah tercatat terjual." />
+
+        <x-stat-card label="Penjualan Bulan Ini" ikon="payments" warna="indigo"
+                     :nilai="number_format($omzetBulanIni, 0, ',', '.')" prefiks="Rp"
+                     :bawah="$piutang > 0
+                        ? 'Piutang belum lunas Rp '.number_format($piutang, 0, ',', '.')
+                        : 'Seluruh nota bulan ini sudah lunas'" />
+    </div>
+
+    {{-- Grafik --}}
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+            <h2 class="font-semibold text-gray-900">Produksi Telur (7 Hari Terakhir)</h2>
+            <p class="text-xs text-gray-500 mt-0.5 mb-4">Telur layak jual per hari; hari tanpa catatan dihitung nol.</p>
+
+            @if (array_sum($chartProduksiData['values']) > 0)
+                <div class="h-72" wire:ignore>
+                    <canvas id="grafikDashboardProduksi"></canvas>
+                </div>
+            @else
+                <div class="h-72 flex flex-col items-center justify-center text-center rounded-lg border border-dashed border-gray-200">
+                    <span class="material-symbols-outlined text-4xl text-gray-300">egg</span>
+                    <p class="text-sm font-medium text-gray-900 mt-2">Belum ada produksi 7 hari terakhir</p>
+                    <p class="text-xs text-gray-500 mt-1">Catat produksi harian untuk membentuk grafik.</p>
+                </div>
+            @endif
         </div>
 
-        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Grafik Penjualan (7 Hari Terakhir)</h3>
-            <canvas id="chartPenjualan"></canvas>
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+            <h2 class="font-semibold text-gray-900">Penjualan Lunas (7 Hari Terakhir)</h2>
+            <p class="text-xs text-gray-500 mt-0.5 mb-4">Nilai nota berstatus lunas; nota belum lunas masuk piutang.</p>
+
+            @if (array_sum($chartPenjualanData['values']) > 0)
+                <div class="h-72" wire:ignore>
+                    <canvas id="grafikDashboardPenjualan"></canvas>
+                </div>
+            @else
+                <div class="h-72 flex flex-col items-center justify-center text-center rounded-lg border border-dashed border-gray-200">
+                    <span class="material-symbols-outlined text-4xl text-gray-300">shopping_basket</span>
+                    <p class="text-sm font-medium text-gray-900 mt-2">Belum ada penjualan lunas 7 hari terakhir</p>
+                    <p class="text-xs text-gray-500 mt-1">Catat penjualan telur di menu Penjualan.</p>
+                </div>
+            @endif
         </div>
     </div>
+
+    {{-- Data grafik dikirim lewat atribut data supaya canvas tidak ikut ter-morph Livewire. --}}
+    <div id="dataGrafikDashboard" class="hidden"
+         data-grafik="{{ json_encode(['produksi' => $chartProduksiData, 'penjualan' => $chartPenjualanData]) }}"></div>
 
     @script
-    <script>
-        const ctxProduksi = document.getElementById('chartProduksi').getContext('2d');
-        new Chart(ctxProduksi, {
-            type: 'line',
-            data: {
-                labels: $wire.chartProduksiData.labels || [],
-                datasets: [{
-                    label: 'Telur Layak Jual',
-                    data: $wire.chartProduksiData.values || [],
-                    borderColor: '#10b981',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false }
-                }
-            }
-        });
+        <script>
+            const gambarGrafikDashboard = () => {
+                const data = Grafik.bacaDataGrafik('dataGrafikDashboard');
 
-        const ctxPenjualan = document.getElementById('chartPenjualan').getContext('2d');
-        new Chart(ctxPenjualan, {
-            type: 'bar',
-            data: {
-                labels: $wire.chartPenjualanData.labels || [],
-                datasets: [{
-                    label: 'Total Penjualan (Rp)',
-                    data: $wire.chartPenjualanData.values || [],
-                    backgroundColor: '#6366f1'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { display: false }
+                if (!data) {
+                    return;
                 }
-            }
-        });
-    </script>
+
+                if (Array.isArray(data.produksi?.labels) && data.produksi.labels.length > 0) {
+                    Grafik.gambarGrafik('grafikDashboardProduksi', {
+                        type: 'line',
+                        data: {
+                            labels: data.produksi.labels,
+                            datasets: [
+                                {
+                                    label: 'Telur Layak Jual (butir)',
+                                    data: data.produksi.values,
+                                    borderColor: '#059669',
+                                    backgroundColor: 'rgba(5, 150, 105, 0.12)',
+                                    fill: true,
+                                    tension: 0.3,
+                                    pointRadius: 3
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: { beginAtZero: true, ticks: { callback: (nilai) => nilai + ' btr' } }
+                            }
+                        }
+                    });
+                }
+
+                if (Array.isArray(data.penjualan?.labels) && data.penjualan.labels.length > 0) {
+                    Grafik.gambarGrafik('grafikDashboardPenjualan', {
+                        type: 'bar',
+                        data: {
+                            labels: data.penjualan.labels,
+                            datasets: [
+                                {
+                                    label: 'Penjualan Lunas (Rp)',
+                                    data: data.penjualan.values,
+                                    backgroundColor: '#6366f1',
+                                    borderRadius: 4
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: (konteks) => 'Rp ' + Number(konteks.raw).toLocaleString('id-ID')
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                }
+            };
+
+            gambarGrafikDashboard();
+        </script>
     @endscript
 </div>

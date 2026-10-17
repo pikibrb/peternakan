@@ -15,12 +15,21 @@ class ProduksiTelur extends Model
         'telur_dihasilkan',
         'telur_rusak',
         'telur_layak_jual',
+        'pakan_kg',
+        'berat_butir_g',
+        'catatan',
     ];
 
     protected function casts(): array
     {
         return [
             'tanggal_produksi' => 'date',
+            'jumlah_bebek' => 'integer',
+            'telur_dihasilkan' => 'integer',
+            'telur_rusak' => 'integer',
+            'telur_layak_jual' => 'integer',
+            'pakan_kg' => 'float',
+            'berat_butir_g' => 'float',
         ];
     }
 

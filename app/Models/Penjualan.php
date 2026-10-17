@@ -13,6 +13,7 @@ class Penjualan extends Model
         'tanggal_penjualan',
         'total_penjualan',
         'status_pembayaran',
+        'catatan',
     ];
 
     protected function casts(): array
@@ -36,5 +37,10 @@ class Penjualan extends Model
     public function scopeLunas($query)
     {
         return $query->where('status_pembayaran', 'Lunas');
+    }
+
+    public function scopeBelumLunas($query)
+    {
+        return $query->where('status_pembayaran', 'Belum Lunas');
     }
 }

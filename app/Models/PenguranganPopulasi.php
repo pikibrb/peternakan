@@ -11,8 +11,10 @@ class PenguranganPopulasi extends Model
     protected $fillable = [
         'kelompok_bebek_id',
         'tanggal',
+        'kategori',
         'jumlah',
         'penyebab',
+        'catatan',
     ];
 
     protected function casts(): array
